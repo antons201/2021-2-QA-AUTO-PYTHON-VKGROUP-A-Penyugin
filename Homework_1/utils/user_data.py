@@ -1,0 +1,6 @@
+email = "testpenyugin@yandex.ru"
+password = "testpass123$"
+fio_before = "test_before"
+fio_after = "test_after"
+phone_before = "+79991111111"
+phone_after = "+79992222222"

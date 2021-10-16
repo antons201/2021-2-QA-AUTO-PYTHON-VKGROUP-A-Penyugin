@@ -1,0 +1,5 @@
+OS: Windows 10
+IDE: Pycharm 2020.3.3+ (Install: https://www.jetbrains.com/pycharm/)
+Python: 3.7+ (Install: https://www.python.org/downloads/)
+Pytest: 6.2.5+ (Install: py -m pip install pytest)
+Selenium: 3.141.0+ (Install: py -m pip install selenium)
