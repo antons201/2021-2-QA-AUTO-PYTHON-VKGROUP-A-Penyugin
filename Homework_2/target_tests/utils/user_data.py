@@ -1,0 +1,5 @@
+email = "testpenyugin@yandex.ru"
+password = "testpass123$"
+nonExistentEmail = "qwerty321@qwerty123.ru"
+nonExistentPassword= "Qwerty321%"
+invalidEmail = "invalidmail"
