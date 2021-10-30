@@ -6,11 +6,6 @@ import logging
 from ui.fixtures import *
 
 
-@pytest.fixture()
-def config(request):
-    pass
-
-
 def pytest_configure(config):
     if sys.platform.startswith('win'):
         base_dir = 'C:\\tests'
@@ -26,7 +21,7 @@ def pytest_configure(config):
     config.base_temp_dir = base_dir  # everywhere
 
 @pytest.fixture(scope='function')
-def logger(temp_dir, config):
+def logger(temp_dir):
     log_formatter = logging.Formatter('%(asctime)s - %(filename)s - %(levelname)s - %(message)s')
     log_file = os.path.join(temp_dir, 'test.log')
     log_level = logging.INFO

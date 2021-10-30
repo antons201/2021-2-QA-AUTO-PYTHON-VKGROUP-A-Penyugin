@@ -35,9 +35,8 @@ class BaseCase:
                 allure.attach(f.read(), 'browser.log', attachment_type=allure.attachment_type.TEXT)
 
     @pytest.fixture(scope='function', autouse=True)
-    def setup(self, driver, config, logger, request: FixtureRequest):
+    def setup(self, driver, logger, request: FixtureRequest):
         self.driver: WebDriver = driver
-        self.config = config
         self.logger = logger
 
         self.base_page: BasePage = request.getfixturevalue('base_page')
@@ -57,7 +56,5 @@ class BaseCase:
 
         with allure.step("Refresh page"):
             self.driver.refresh()
-        with allure.step("Get Auth page"):
-            self.auth_page = AuthPage(self.driver)
 
         return self.auth_page

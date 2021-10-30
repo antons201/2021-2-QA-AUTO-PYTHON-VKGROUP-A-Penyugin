@@ -7,4 +7,4 @@ class LoginPageLocators(BasePageLocators):
     EMAIL_LOCATOR = (By.NAME, "email")
     PASSWORD_LOCATOR = (By.NAME, "password")
     AUTH_LOCATOR = (By.CSS_SELECTOR, "div[class^='authForm-module-button']")
-    INCORRECT_EMAIL_LOCATOR = (By.XPATH, "//div[contains(string(), 'Введите email или телефон')]")
+    INCORRECT_EMAIL_LOCATOR = (By.XPATH, "//div[contains(@class, 'authForm-module-notify')]/div[contains(@class, 'undefined')]")
