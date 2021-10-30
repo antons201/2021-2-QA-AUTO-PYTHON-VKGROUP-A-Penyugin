@@ -29,7 +29,7 @@ class SegmentsPage(BasePage):
         segment_name = self.find(
             SegmentsPageLocators.SEGMENT_NAME_LOCATOR).get_attribute("value")
 
-        self.click(SegmentsPageLocators.CREATE_SEGMENT_LOCATOR)
+        self.click(SegmentsPageLocators.SUBMIT_CREATE_SEGMENT_LOCATOR)
 
         with allure.step("Checking that the segment has been created"):
             self.find((SegmentsPageLocators.SEGMENT_NAME_LOCATOR[0],
