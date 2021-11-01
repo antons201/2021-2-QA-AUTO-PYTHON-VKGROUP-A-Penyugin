@@ -2,8 +2,7 @@ import allure
 import pytest
 
 from base import BaseCase
-from ui.locators import login_page_locators, invalid_login_locators, dashboard_page_locators, segments_page_locators
-from selenium.common.exceptions import TimeoutException
+from ui.locators import login_page_locators, invalid_login_locators
 from utils import user_data
 
 
@@ -28,27 +27,17 @@ class TestTarget(BaseCase):
     @allure.feature('UI tests')
     @allure.description("Checking the creation of a company with valid data")
     @pytest.mark.UI
-    @pytest.mark.usefixtures('login')
-    @pytest.mark.usefixtures('file_path')
-    def test_create_company(self, auth_page, file_path):
-        dashboard_page = auth_page.go_to_dashboard()
-
-        dashboard_page.create_company(file_path)
+    def test_create_company(self, file_path, auth_dashboard_page):
+        auth_dashboard_page.create_company(file_path)
 
     @allure.feature('UI tests')
     @allure.description("Checking the creation of a segment with valid data")
     @pytest.mark.UI
-    @pytest.mark.usefixtures('login')
-    def test_create_segment(self, auth_page):
-        segments_page = auth_page.go_to_segments()
-
-        segments_page.create_segment()
+    def test_create_segment(self, auth_segments_page):
+        auth_segments_page.create_segment()
 
     @allure.feature('UI tests')
     @allure.description("Checking the deletion of a newly created segment")
     @pytest.mark.UI
-    @pytest.mark.usefixtures('login')
-    def test_delete_segment(self, auth_page):
-        segments_page = auth_page.go_to_segments()
-
-        segments_page.delete_segment(segments_page.create_segment())
+    def test_delete_segment(self, auth_segments_page):
+        auth_segments_page.delete_segment(auth_segments_page.create_segment())

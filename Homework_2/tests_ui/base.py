@@ -57,4 +57,12 @@ class BaseCase:
         with allure.step("Refresh page"):
             self.driver.refresh()
 
-        return self.auth_page
+        yield self.auth_page
+
+    @pytest.fixture(scope='function')
+    def auth_dashboard_page(self, login):
+        yield login.go_to_dashboard()
+
+    @pytest.fixture(scope='function')
+    def auth_segments_page(self, login):
+        yield login.go_to_segments()
