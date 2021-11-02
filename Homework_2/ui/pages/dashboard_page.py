@@ -1,11 +1,12 @@
 import allure
+import pytest
 
 from ui.pages.base_page import BasePage
 from ui.locators.dashboard_page_locators import DashboardPageLocators
 from utils import company_data, constants
 from random import randint
 from utils.decorators import wait
-from selenium.common.exceptions import ElementNotInteractableException
+from selenium.common.exceptions import ElementNotInteractableException, TimeoutException
 
 
 class DashboardPage(BasePage):
@@ -32,8 +33,15 @@ class DashboardPage(BasePage):
         self.wait_locator(DashboardPageLocators.UPLOAD_PROCESS_LOCATOR)
         self.click(DashboardPageLocators.SUBMIT_CREATE_LOCATOR)
 
-        with allure.step("Checking that the company has been created"):
+        return company_name
+
+    @allure.step("Checking that the company has been created")
+    def check_company_created(self, company_name):
+        try:
             self.find((DashboardPageLocators.COMPANY_LOCATOR[0],
                        DashboardPageLocators.COMPANY_LOCATOR[1].format(company_name)))
 
-        self.logger.info(f"A company with the name {company_name} has been created")
+            self.logger.info(f"A company with the name {company_name} has been created")
+        except TimeoutException:
+            self.logger.info(f"A company with the name {company_name} has not been created")
+            pytest.fail('CREATE COMPANY EXCEPTION')

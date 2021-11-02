@@ -31,12 +31,6 @@ class SegmentsPage(BasePage):
 
         self.click(SegmentsPageLocators.SUBMIT_CREATE_SEGMENT_LOCATOR)
 
-        with allure.step("Checking that the segment has been created"):
-            self.find((SegmentsPageLocators.SEGMENT_NAME_LOCATOR[0],
-                       SegmentsPageLocators.SEGMENT_NAME_LOCATOR[1].format(segment_name)))
-
-        self.logger.info(f"A segment with the name {segment_name} has been created")
-
         return segment_name
 
     @allure.step("Attempt to delete a segment")
@@ -45,12 +39,24 @@ class SegmentsPage(BasePage):
                     format(segment_name)))
         self.click(SegmentsPageLocators.SUBMIT_DELETE_LOCATOR)
 
-        with allure.step("Checking that the segment has been deleted"):
-            try:
-                self.find((SegmentsPageLocators.SEGMENT_NAME_LOCATOR[0],
-                           SegmentsPageLocators.SEGMENT_NAME_LOCATOR[1].format(segment_name)), 3)
-                self.logger.info(f"A segment with the name {segment_name} has not been deleted")
-                pytest.fail('DELETE EXCEPTION')
-            except TimeoutException:
-                self.logger.info(f"A segment with the name {segment_name} has been deleted")
-                pass
+    @allure.step("Checking that the segment has been created")
+    def check_segment_created(self, segment_name):
+        try:
+            self.find((SegmentsPageLocators.SEGMENT_NAME_LOCATOR[0],
+                    SegmentsPageLocators.SEGMENT_NAME_LOCATOR[1].format(segment_name)))
+
+            self.logger.info(f"A segment with the name {segment_name} has been created")
+        except TimeoutException:
+            self.logger.info(f"A segment with the name {segment_name} has not been created")
+            pytest.fail('CREATE SEGMENT EXCEPTION')
+
+    @allure.step("Checking that the segment has been deleted")
+    def check_segment_deleted(self, segment_name):
+        try:
+            self.find((SegmentsPageLocators.SEGMENT_NAME_LOCATOR[0],
+                        SegmentsPageLocators.SEGMENT_NAME_LOCATOR[1].format(segment_name)), 3)
+            self.logger.info(f"A segment with the name {segment_name} has not been deleted")
+            pytest.fail('DELETE SEGMENT EXCEPTION')
+        except TimeoutException:
+            self.logger.info(f"A segment with the name {segment_name} has been deleted")
+            pass
