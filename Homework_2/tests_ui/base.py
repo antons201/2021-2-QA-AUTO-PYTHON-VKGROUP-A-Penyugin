@@ -5,13 +5,6 @@ import pytest
 from _pytest.fixtures import FixtureRequest
 from selenium.webdriver.remote.webdriver import WebDriver
 
-from ui.pages.base_page import BasePage
-from ui.pages.login_page import LoginPage
-from ui.pages.invalid_login_page import InvalidLoginPage
-from ui.pages.auth_page import AuthPage
-from ui.pages.dashboard_page import DashboardPage
-from ui.pages.segments_page import SegmentsPage
-
 
 class BaseCase:
 
@@ -38,31 +31,3 @@ class BaseCase:
     def setup(self, driver, logger, request: FixtureRequest):
         self.driver: WebDriver = driver
         self.logger = logger
-
-        self.base_page: BasePage = request.getfixturevalue('base_page')
-        self.login_page: LoginPage = request.getfixturevalue('login_page')
-        self.invalid_login_page: InvalidLoginPage = request.getfixturevalue('invalid_login_page')
-        self.auth_page: AuthPage = request.getfixturevalue("auth_page")
-        self.dashboard_page: DashboardPage = request.getfixturevalue("dashboard_page")
-        self.segments_page: SegmentsPage = request.getfixturevalue("segments_page")
-
-    @pytest.fixture(scope='function')
-    def login(self, request: FixtureRequest):
-        with allure.step("Get cookies"):
-            cookies = request.getfixturevalue('cookies')
-        with allure.step("Add cookies"):
-            for cookie in cookies:
-                self.driver.add_cookie(cookie)
-
-        with allure.step("Refresh page"):
-            self.driver.refresh()
-
-        yield self.auth_page
-
-    @pytest.fixture(scope='function')
-    def auth_dashboard_page(self, login):
-        yield login.go_to_dashboard()
-
-    @pytest.fixture(scope='function')
-    def auth_segments_page(self, login):
-        yield login.go_to_segments()

@@ -1,6 +1,8 @@
 import allure
 import pytest
 import os
+
+from _pytest.fixtures import FixtureRequest
 from selenium import webdriver
 from webdriver_manager.chrome import ChromeDriverManager
 from utils import user_data
@@ -32,12 +34,12 @@ def auth_page(driver):
     return AuthPage(driver=driver)
 
 @pytest.fixture
-def dashboard_page(driver):
-    return DashboardPage(driver=driver)
+def dashboard_page(login):
+    return login.go_to_dashboard()
 
 @pytest.fixture
-def segments_page(driver):
-    return SegmentsPage(driver=driver)
+def segments_page(login):
+    return login.go_to_segments()
 
 def get_driver():
     manager = ChromeDriverManager(version='latest')
@@ -72,3 +74,16 @@ def cookies():
 @pytest.fixture(scope='function')
 def file_path(repo_root):
     return os.path.join(repo_root, "files", "test_company_image.jpg")
+
+@pytest.fixture(scope='function')
+def login(driver, request: FixtureRequest, auth_page):
+    with allure.step("Get cookies"):
+        cookies = request.getfixturevalue('cookies')
+    with allure.step("Add cookies"):
+        for cookie in cookies:
+            driver.add_cookie(cookie)
+
+    with allure.step("Refresh page"):
+        driver.refresh()
+
+    yield auth_page
