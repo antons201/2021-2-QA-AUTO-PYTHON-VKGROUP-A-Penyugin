@@ -2,8 +2,9 @@ import allure
 import pytest
 
 from base import BaseCase
-from ui.locators import login_page_locators, invalid_login_locators
+from ui.locators import login_page_locators, invalid_login_locators, dashboard_page_locators, segments_page_locators
 from utils import user_data
+from selenium.common.exceptions import TimeoutException
 
 
 class TestTarget(BaseCase):
@@ -14,7 +15,16 @@ class TestTarget(BaseCase):
     @pytest.mark.UI
     def test_invalid_login(self, login_page, invalid_login_page):
         login_page.attempt_to_login(user_data.nonExistentEmail, user_data.nonExistentPassword)
-        invalid_login_page.invalid_login_check(invalid_login_locators.InvalidLoginLocators.INVALID_LOGIN_LOCATOR)
+
+        with allure.step("Checking the appearance of a message about an incorrect login"):
+            try:
+                invalid_login_page.find(invalid_login_locators.InvalidLoginLocators.INVALID_LOGIN_LOCATOR).is_displayed()
+                self.logger.info(f"Login attempt failed. Found: "
+                                 f"{invalid_login_locators.InvalidLoginLocators.INVALID_LOGIN_LOCATOR}")
+            except TimeoutException:
+                self.logger.info(f"Not found: {invalid_login_locators.InvalidLoginLocators.INVALID_LOGIN_LOCATOR}")
+                pytest.fail('INVALID LOGIN EXCEPTION')
+
 
     @allure.feature('UI tests')
     @allure.description("Checking an attempt to log in with an incorrect email and password. "
@@ -22,21 +32,47 @@ class TestTarget(BaseCase):
     @pytest.mark.UI
     def test_incorrect_login(self, login_page):
         login_page.attempt_to_login(user_data.invalidEmail, user_data.nonExistentPassword)
-        login_page.incorrect_login_check(login_page_locators.LoginPageLocators.INCORRECT_EMAIL_LOCATOR)
+
+        with allure.step("Checking the appearance of a message about an incorrect login"):
+            try:
+                login_page.find(login_page_locators.LoginPageLocators.INCORRECT_EMAIL_LOCATOR).is_displayed()
+                self.logger.info(f"Login attempt failed. Found: "
+                                 f"{login_page_locators.LoginPageLocators.INCORRECT_EMAIL_LOCATOR}")
+            except TimeoutException:
+                self.logger.info(f"Not found: {login_page_locators.LoginPageLocators.INCORRECT_EMAIL_LOCATOR}")
+                pytest.fail('INCORRECT LOGIN EXCEPTION')
 
     @allure.feature('UI tests')
     @allure.description("Checking the creation of a company with valid data")
     @pytest.mark.UI
     def test_create_company(self, file_path, dashboard_page):
         company_name = dashboard_page.create_company(file_path)
-        dashboard_page.check_company_created(company_name)
+
+        with allure.step("Checking that the company has been created"):
+            try:
+                dashboard_page.find((dashboard_page_locators.DashboardPageLocators.COMPANY_LOCATOR[0],
+                                     dashboard_page_locators.DashboardPageLocators.COMPANY_LOCATOR[1].format(company_name)))
+
+                self.logger.info(f"A company with the name {company_name} has been created")
+            except TimeoutException:
+                self.logger.info(f"A company with the name {company_name} has not been created")
+                pytest.fail('CREATE COMPANY EXCEPTION')
 
     @allure.feature('UI tests')
     @allure.description("Checking the creation of a segment with valid data")
     @pytest.mark.UI
     def test_create_segment(self, segments_page):
         segment_name = segments_page.create_segment()
-        segments_page.check_segment_created(segment_name)
+
+        with allure.step("Checking that the segment has been created"):
+            try:
+                segments_page.find((segments_page_locators.SegmentsPageLocators.SEGMENT_NAME_LOCATOR[0],
+                           segments_page_locators.SegmentsPageLocators.SEGMENT_NAME_LOCATOR[1].format(segment_name)))
+
+                self.logger.info(f"A segment with the name {segment_name} has been created")
+            except TimeoutException:
+                self.logger.info(f"A segment with the name {segment_name} has not been created")
+                pytest.fail('CREATE SEGMENT EXCEPTION')
 
     @allure.feature('UI tests')
     @allure.description("Checking the deletion of a newly created segment")
@@ -44,4 +80,13 @@ class TestTarget(BaseCase):
     def test_delete_segment(self, segments_page):
         segment_name = segments_page.create_segment()
         segments_page.delete_segment(segment_name)
-        segments_page.check_segment_deleted(segment_name)
+
+        with allure.step("Checking that the segment has been deleted"):
+            try:
+                segments_page.find((segments_page_locators.SegmentsPageLocators.SEGMENT_NAME_LOCATOR[0],
+                                    segments_page_locators.SegmentsPageLocators.SEGMENT_NAME_LOCATOR[1].format(segment_name)), 3)
+                self.logger.info(f"A segment with the name {segment_name} has not been deleted")
+                pytest.fail('DELETE SEGMENT EXCEPTION')
+
+            except TimeoutException:
+                self.logger.info(f"A segment with the name {segment_name} has been deleted")

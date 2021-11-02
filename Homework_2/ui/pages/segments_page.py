@@ -38,25 +38,3 @@ class SegmentsPage(BasePage):
         self.click((SegmentsPageLocators.DELETE_SEGMENT_LOCATOR[0], SegmentsPageLocators.DELETE_SEGMENT_LOCATOR[1].
                     format(segment_name)))
         self.click(SegmentsPageLocators.SUBMIT_DELETE_LOCATOR)
-
-    @allure.step("Checking that the segment has been created")
-    def check_segment_created(self, segment_name):
-        try:
-            self.find((SegmentsPageLocators.SEGMENT_NAME_LOCATOR[0],
-                    SegmentsPageLocators.SEGMENT_NAME_LOCATOR[1].format(segment_name)))
-
-            self.logger.info(f"A segment with the name {segment_name} has been created")
-        except TimeoutException:
-            self.logger.info(f"A segment with the name {segment_name} has not been created")
-            pytest.fail('CREATE SEGMENT EXCEPTION')
-
-    @allure.step("Checking that the segment has been deleted")
-    def check_segment_deleted(self, segment_name):
-        try:
-            self.find((SegmentsPageLocators.SEGMENT_NAME_LOCATOR[0],
-                        SegmentsPageLocators.SEGMENT_NAME_LOCATOR[1].format(segment_name)), 3)
-            self.logger.info(f"A segment with the name {segment_name} has not been deleted")
-            pytest.fail('DELETE SEGMENT EXCEPTION')
-        except TimeoutException:
-            self.logger.info(f"A segment with the name {segment_name} has been deleted")
-            pass
