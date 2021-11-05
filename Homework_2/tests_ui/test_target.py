@@ -2,7 +2,6 @@ import allure
 import pytest
 
 from base import BaseCase
-from ui.locators import login_page_locators, invalid_login_locators, dashboard_page_locators, segments_page_locators
 from utils import user_data
 from selenium.common.exceptions import TimeoutException
 
@@ -17,13 +16,8 @@ class TestTarget(BaseCase):
         login_page.attempt_to_login(user_data.nonExistentEmail, user_data.nonExistentPassword)
 
         with allure.step("Checking the appearance of a message about an incorrect login"):
-            try:
-                invalid_login_page.find(invalid_login_locators.InvalidLoginLocators.INVALID_LOGIN_LOCATOR).is_displayed()
-                self.logger.info(f"Login attempt failed. Found: "
-                                 f"{invalid_login_locators.InvalidLoginLocators.INVALID_LOGIN_LOCATOR}")
-            except TimeoutException:
-                self.logger.info(f"Not found: {invalid_login_locators.InvalidLoginLocators.INVALID_LOGIN_LOCATOR}")
-                pytest.fail('INVALID LOGIN EXCEPTION')
+            assert invalid_login_page.find(invalid_login_page.locators.INVALID_LOGIN_LOCATOR).is_displayed()
+            self.logger.info(f"Login attempt failed. Found: {invalid_login_page.locators.INVALID_LOGIN_LOCATOR}")
 
 
     @allure.feature('UI tests')
@@ -35,11 +29,10 @@ class TestTarget(BaseCase):
 
         with allure.step("Checking the appearance of a message about an incorrect login"):
             try:
-                login_page.find(login_page_locators.LoginPageLocators.INCORRECT_EMAIL_LOCATOR).is_displayed()
-                self.logger.info(f"Login attempt failed. Found: "
-                                 f"{login_page_locators.LoginPageLocators.INCORRECT_EMAIL_LOCATOR}")
+                login_page.find(login_page.locators.INCORRECT_EMAIL_LOCATOR)
+                self.logger.info(f"Login attempt failed. Found: {login_page.locators.INCORRECT_EMAIL_LOCATOR}")
             except TimeoutException:
-                self.logger.info(f"Not found: {login_page_locators.LoginPageLocators.INCORRECT_EMAIL_LOCATOR}")
+                self.logger.info(f"Not found: {login_page.locators.INCORRECT_EMAIL_LOCATOR}")
                 pytest.fail('INCORRECT LOGIN EXCEPTION')
 
     @allure.feature('UI tests')
@@ -50,8 +43,8 @@ class TestTarget(BaseCase):
 
         with allure.step("Checking that the company has been created"):
             try:
-                dashboard_page.find((dashboard_page_locators.DashboardPageLocators.COMPANY_LOCATOR[0],
-                                     dashboard_page_locators.DashboardPageLocators.COMPANY_LOCATOR[1].format(company_name)))
+                dashboard_page.find((dashboard_page.locators.COMPANY_LOCATOR[0],
+                                     dashboard_page.locators.COMPANY_LOCATOR[1].format(company_name)))
 
                 self.logger.info(f"A company with the name {company_name} has been created")
             except TimeoutException:
@@ -66,8 +59,8 @@ class TestTarget(BaseCase):
 
         with allure.step("Checking that the segment has been created"):
             try:
-                segments_page.find((segments_page_locators.SegmentsPageLocators.SEGMENT_NAME_LOCATOR[0],
-                           segments_page_locators.SegmentsPageLocators.SEGMENT_NAME_LOCATOR[1].format(segment_name)))
+                segments_page.find((segments_page.locators.SEGMENT_NAME_LOCATOR[0],
+                                    segments_page.locators.SEGMENT_NAME_LOCATOR[1].format(segment_name)))
 
                 self.logger.info(f"A segment with the name {segment_name} has been created")
             except TimeoutException:
@@ -83,8 +76,8 @@ class TestTarget(BaseCase):
 
         with allure.step("Checking that the segment has been deleted"):
             try:
-                segments_page.find((segments_page_locators.SegmentsPageLocators.SEGMENT_NAME_LOCATOR[0],
-                                    segments_page_locators.SegmentsPageLocators.SEGMENT_NAME_LOCATOR[1].format(segment_name)), 3)
+                segments_page.find((segments_page.locators.SEGMENT_NAME_LOCATOR[0],
+                                    segments_page.locators.SEGMENT_NAME_LOCATOR[1].format(segment_name)), 3)
                 self.logger.info(f"A segment with the name {segment_name} has not been deleted")
                 pytest.fail('DELETE SEGMENT EXCEPTION')
 
