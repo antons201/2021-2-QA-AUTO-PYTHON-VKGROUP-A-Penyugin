@@ -119,7 +119,7 @@ class ApiClient:
         return response
 
     def get_segment(self, segment_id, expected_status):
-        location = f'segments/segments_list/{segment_id}'
+        location = f'api/v2/remarketing/segments/{segment_id}.json'
         referer_location = f'segments/segments_list/{segment_id}'
 
         response = self._request('GET', location, headers=self.headers(referer_location), expected_status=expected_status)
