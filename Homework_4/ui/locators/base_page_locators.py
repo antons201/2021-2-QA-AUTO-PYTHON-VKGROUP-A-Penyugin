@@ -1,0 +1,4 @@
+
+
+class BasePageLocators:
+    pass

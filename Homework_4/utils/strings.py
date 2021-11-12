@@ -1,0 +1,8 @@
+RUSSIA_REQUEST = "Russia"
+RUSSIA_TITLE = "Россия"
+RUSSIA_DESCRIPTION_START = "Росси́я"
+EXAMPLE = "25+35"
+SUM = "60"
+NEWS_SOURCE = "Вести FM"
+VERSION = "Версия {}"
+COPYRIGHT = "Mail.ru Group © 1998–2021. Все права защищены."
