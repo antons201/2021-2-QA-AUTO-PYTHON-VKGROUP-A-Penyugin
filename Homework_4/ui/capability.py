@@ -6,6 +6,7 @@ def capability_select(file_path):
         "appPackage": "ru.mail.search.electroscope",
         "appActivity": ".ui.activity.AssistantActivity",
         "app": file_path,
-        "orientation": "PORTRAIT"
+        "orientation": "PORTRAIT",
+        "autoGrantPermissions": "true"
 }
     return capability

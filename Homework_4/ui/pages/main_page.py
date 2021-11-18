@@ -7,10 +7,6 @@ from appium.webdriver.common.mobileby import MobileBy
 class MainPage(BasePage):
     locators = MainPageLocators()
 
-    def allow_permissions(self):
-        self.click(MainPageLocators.AGREE_FOREGROUND_LOCATOR)
-        self.click(MainPageLocators.AGREE_LOCATOR)
-
     def enter_text(self, text):
         self.click(MainPageLocators.KEYBOARD_LOCATOR)
         self.send_text(text)
@@ -30,11 +26,23 @@ class MainPage(BasePage):
         description = self.find(MainPageLocators.CARD_DESCRIPTION_LOCATOR)
         assert description.text[0:7] == text_description
 
-    def click_suggest(self):
+    def click_suggest(self, population, population_size):
         self.swipe_element_to_left(MainPageLocators.SUGGEST_LIST_LOCATOR)
-        self.click((MobileBy.XPATH, MainPageLocators.SUGGEST_LOCATOR.format("население россии")))
-        self.find((MobileBy.XPATH, MainPageLocators.SUGGEST_TITLE_LOCATOR.format("146 млн.")))
+        self.click((MobileBy.XPATH, MainPageLocators.SUGGEST_LOCATOR.format(population)))
+        self.find((MobileBy.XPATH, MainPageLocators.SUGGEST_TITLE_LOCATOR.format(population_size)))
 
-    def check_source_news(self, news_source):
-        self.enter_text("News")
-        self.find((MobileBy.XPATH, MainPageLocators.RESPONSE_LOCATOR.format(news_source)))
+    def check_source_news(self, news_request, news_source_player):
+        self.enter_text(news_request)
+        self.find((MobileBy.XPATH, MainPageLocators.PLAYER_LOCATOR.format(news_source_player)))
+
+    def send_request_with_card_response(self, request, title, description):
+        self.enter_text(request)
+        self.check_card(request, title, description)
+
+    def send_request_with_string_response(self, request, response):
+        self.enter_text(request)
+        self.find((MobileBy.XPATH, MainPageLocators.RESPONSE_LOCATOR.format(response)))
+
+    def go_to_menu(self):
+        self.click(MainPageLocators.MENU_LOCATOR)
+

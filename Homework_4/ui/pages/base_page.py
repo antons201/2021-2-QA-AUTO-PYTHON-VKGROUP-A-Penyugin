@@ -53,12 +53,12 @@ class BasePage(object):
             release(). \
             perform()
 
-    def swipe_up(self, swipetime=100):
+    def swipe_up(self, swipetime=200):
         action = TouchAction(self.driver)
         dimension = self.driver.get_window_size()
         x = int(dimension['width'] / 2)
-        start_y = int(dimension['height'] * 0.95)
-        end_y = int(dimension['height'] * 0.05)
+        start_y = int(dimension['height'] * 0.99)
+        end_y = int(dimension['height'] * 0.01)
         action. \
             press(x=x, y=start_y). \
             wait(ms=swipetime). \

@@ -9,4 +9,7 @@ class NewsSourcesPage(BasePage):
     def select_news_source(self, news_source):
         self.click((MobileBy.XPATH, NewsSourcesPageLocators.NEWS_TYPE_LOCATOR.format(2, news_source)))
         self.find((MobileBy.XPATH, NewsSourcesPageLocators.NEWS_SELECTED_LOCATOR.format(2)))
+        self.back_to_menu()
+
+    def back_to_menu(self):
         self.click(NewsSourcesPageLocators.BACK_BUTTON_LOCATOR)
