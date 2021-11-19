@@ -1,7 +1,3 @@
-import os
-
-import pytest
-
 from mysql_orm.client import MysqlORMClient
 from mysql_orm.fixtures import *
 
