@@ -105,18 +105,7 @@ class ApiClient:
         self.mc = response.history[2].cookies.get('mc')
         self.sdc = response.history[4].cookies.get('sdc')
 
-        self.session.cookies = cookiejar_from_dict({
-            'mc': self.mc,
-            'sdc': self.sdc
-        })
-
         self.get_csrftoken()
-
-        self.session.cookies = cookiejar_from_dict({
-            'mc': self.mc,
-            'sdc': self.sdc,
-            'csrftoken': self.csrf
-        })
 
     def get_csrftoken(self):
         location = 'csrf/'

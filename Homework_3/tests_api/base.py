@@ -19,17 +19,14 @@ class ApiBase:
 
     def create_campaign(self, campaign_name):
         campaign_id = self.api_client.post_create_campaign(campaign_name, self.file_path)
-        assert self.api_client.get_campaign(campaign_id, 200) == campaign_name
         return campaign_id
 
     def delete_campaign(self, campaign_id):
-        assert self.api_client.get_delete_campaign(campaign_id)
+        return self.api_client.get_delete_campaign(campaign_id)
 
     def create_segment(self, segment_name):
         segment_id = self.api_client.post_create_segment(segment_name)
-        assert self.api_client.get_segment(segment_id, 200).json().get('name') == segment_name
         return segment_id
 
     def delete_segment(self, segment_id):
-        assert self.api_client.delete_delete_segment(segment_id).status_code == 204
-        assert self.api_client.get_segment(segment_id, 404).status_code == 404
+        return self.api_client.delete_delete_segment(segment_id)
