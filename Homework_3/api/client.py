@@ -1,10 +1,7 @@
 import json
-import os
 from urllib.parse import urljoin
-import pytest
 
 import requests
-from requests.cookies import cookiejar_from_dict
 
 
 class ResponseErrorException(Exception):
