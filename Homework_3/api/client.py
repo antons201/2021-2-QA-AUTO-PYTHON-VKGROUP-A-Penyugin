@@ -1,7 +1,9 @@
 import json
-from urllib.parse import urljoin
-
 import requests
+
+from urllib.parse import urljoin
+from utils import constants as const
+from utils import locations
 
 
 class ResponseErrorException(Exception):
@@ -14,9 +16,9 @@ class ResponseStatusCodeException(Exception):
 
 class ApiClient:
     def __init__(self):
-        self.base_url = 'https://target.my.com/'
-        self.email = 'testpenyugin@yandex.ru'
-        self.password = 'testpass123$'
+        self.base_url = const.URL
+        self.email = const.EMAIL
+        self.password = const.PASSWORD
 
         self.session = requests.Session()
         self.mc = None
@@ -87,112 +89,93 @@ class ApiClient:
         return response
 
     def post_login(self):
-        login_location = 'https://auth-ac.my.com/auth?lang=ru&nosavelogin=0'
-        continue_location = 'auth/mycom?state=target_login%3D1%26ignore_opener%3D1#email'
         headers = {
             'Referer': self.base_url
         }
         data = {
             'email': self.email,
             'password': self.password,
-            'continue': urljoin(self.base_url, continue_location),
-            'failure': 'https://account.my.com/login/'
+            'continue': urljoin(self.base_url, locations.CONTINUE_LOCATION),
+            'failure': const.FAILURE_LOGIN_URL
         }
 
-        response = self._request('POST', login_location, headers=headers, data=data, allow_redirects=True,
+        response = self._request('POST', locations.LOGIN_LOCATION, headers=headers, data=data, allow_redirects=True,
                                  join_url=False)
-
-        self.mc = response.history[2].cookies.get('mc')
-        self.sdc = response.history[4].cookies.get('sdc')
 
         self.get_csrftoken()
 
+        return response
+
     def get_csrftoken(self):
-        location = 'csrf/'
         headers = {
             'Referer': urljoin(self.base_url, 'dashboard')
         }
 
-        response = self._request('GET', location, headers=headers, allow_redirects=True)
+        response = self._request('GET', locations.CSRF, headers=headers, allow_redirects=True)
 
         self.csrf = response.cookies.get('csrftoken')
 
     def post_create_segment(self, segment_name):
-        location = 'api/v2/remarketing/segments.json'
-        referer_location = 'segments/segments_list/new'
-
         data = json.dumps(self.segment_structure(segment_name))
 
-        response = self._request('POST', location, headers=self.headers(referer_location), data=data, jsonify=True)
+        response = self._request('POST', locations.CREATE_SEGMENT,
+                                 headers=self.headers(locations.REFERER_CREATE_SEGMENT), data=data, jsonify=True)
         return response.get('id')
 
     def delete_delete_segment(self, segment_id):
-        location = f'api/v2/remarketing/segments/{segment_id}.json'
-        referer_location = 'segments/segments_list'
-
-        response = self._request('DELETE', location, headers=self.headers(referer_location), expected_status=204)
+        response = self._request('DELETE', locations.DELETE_SEGMENT.format(segment_id),
+                                 headers=self.headers(locations.REFERER_DELETE_SEGMENT), expected_status=204)
         return response
 
     def get_segment(self, segment_id, expected_status):
-        location = f'api/v2/remarketing/segments/{segment_id}.json'
-        referer_location = f'segments/segments_list/{segment_id}'
-
-        response = self._request('GET', location, headers=self.headers(referer_location),
+        response = self._request('GET', locations.GET_SEGMENT.format(segment_id),
+                                 headers=self.headers(locations.REFERER_GET_SEGMENT.format(segment_id)),
                                  expected_status=expected_status, jsonify=True)
         return response.get('name')
 
     def get_url(self):
-        location = 'api/v1/urls/'
-        referer_location = 'campaign/new'
-
         params = {
-            'url': 'https://mail.ru/'
+            'url': const.CAMPAIGN_URL
         }
 
-        response = self._request('GET', location, headers=self.headers(referer_location), params=params, jsonify=True)
+        response = self._request('GET', locations.GET_URL, headers=self.headers(locations.REFERER_GET_URL),
+                                 params=params, jsonify=True)
         return response.get('id')
 
     def post_load_file(self, file_path):
-        location = 'api/v2/content/static.json'
-        referer_location = 'campaign/new'
-
         file = {
             'file': open(file_path, 'rb'),
             'data': '{"width": 0, "height": 0}'
         }
 
-        response = self._request('POST', location, headers=self.headers(referer_location), files=file, jsonify=True)
+        response = self._request('POST', locations.LOAD_FILE, headers=self.headers(locations.REFERER_LOAD_FILE),
+                                 files=file, jsonify=True)
         return response.get('id')
 
     def post_create_campaign(self, campaign_name, file_path):
-        location = 'api/v2/campaigns.json'
-        referer_location = 'campaign/new'
         image_id = self.post_load_file(file_path)
         url_id = self.get_url()
 
         data = json.dumps(self.campaign_structure(campaign_name, image_id, url_id))
 
-        response = self._request('POST', location, headers=self.headers(referer_location), data=data, jsonify=True)
+        response = self._request('POST', locations.CREATE_CAMPAIGN,
+                                 headers=self.headers(locations.REFERER_CREATE_CAMPAIGN), data=data, jsonify=True)
         return response.get('id')
 
     def get_delete_campaign(self, campaign_id):
-        location = 'api/v2/campaigns/mass_action.json'
-        referer_location = 'dashboard'
-
         data = json.dumps([{
             'id': campaign_id,
             'status': 'deleted'
         }])
 
-        response = self._request('POST', location, headers=self.headers(referer_location), data=data,
+        response = self._request('POST', locations.DELETE_CAMPAIGN,
+                                 headers=self.headers(locations.REFERER_DELETE_CAMPAIGN), data=data,
                                  expected_status=204)
         return response
 
     def get_campaign(self, campaign_id, expected_status):
-        location = f'api/v2/campaigns/{campaign_id}.json'
-        referer_location = f'campaign/{campaign_id}?'
-
-        response = self._request('GET', location, headers=self.headers(referer_location),
+        response = self._request('GET', locations.GET_CAMPAIGN.format(campaign_id),
+                                 headers=self.headers(locations.REFERER_GET_CAMPAIGN.format(campaign_id)),
                                  expected_status=expected_status, jsonify=True)
         return response.get('name')
 
