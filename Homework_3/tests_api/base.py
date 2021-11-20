@@ -30,3 +30,9 @@ class ApiBase:
 
     def delete_segment(self, segment_id):
         return self.api_client.delete_delete_segment(segment_id)
+
+    def check_campaign(self, campaign_id, campaign_name):
+        return self.api_client.get_campaign(campaign_id, 200) == campaign_name
+
+    def check_segment(self, segment_id, segment_name):
+        return self.api_client.get_segment(segment_id, 200) == segment_name

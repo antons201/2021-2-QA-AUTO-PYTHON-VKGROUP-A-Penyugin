@@ -67,13 +67,15 @@ class ApiClient:
 
         }
 
-    def _request(self, method, location, headers=None, data=None, params=None, files=None, allow_redirects = False, expected_status=200, join_url = True, jsonify=False):
+    def _request(self, method, location, headers=None, data=None, params=None, files=None, allow_redirects = False,
+                 expected_status=200, join_url = True, jsonify=False):
         if (join_url):
             url = urljoin(self.base_url, location)
         else:
             url = location
 
-        response = self.session.request(method, url, headers=headers, data=data, params=params, files=files, allow_redirects=allow_redirects)
+        response = self.session.request(method, url, headers=headers, data=data, params=params, files=files,
+                                        allow_redirects=allow_redirects)
 
         if response.status_code != expected_status:
             raise ResponseStatusCodeException(f'Got {response.status_code} {response.request} for URL "{url}"')
@@ -97,7 +99,8 @@ class ApiClient:
             'failure': 'https://account.my.com/login/'
         }
 
-        response = self._request('POST', login_location, headers=headers, data=data, allow_redirects=True, join_url=False)
+        response = self._request('POST', login_location, headers=headers, data=data, allow_redirects=True,
+                                 join_url=False)
 
         self.mc = response.history[2].cookies.get('mc')
         self.sdc = response.history[4].cookies.get('sdc')
@@ -134,8 +137,9 @@ class ApiClient:
         location = f'api/v2/remarketing/segments/{segment_id}.json'
         referer_location = f'segments/segments_list/{segment_id}'
 
-        response = self._request('GET', location, headers=self.headers(referer_location), expected_status=expected_status)
-        return response
+        response = self._request('GET', location, headers=self.headers(referer_location),
+                                 expected_status=expected_status, jsonify=True)
+        return response.get('name')
 
     def get_url(self):
         location = 'api/v1/urls/'
@@ -180,13 +184,15 @@ class ApiClient:
             'status': 'deleted'
         }])
 
-        response = self._request('POST', location, headers=self.headers(referer_location), data=data, expected_status=204)
+        response = self._request('POST', location, headers=self.headers(referer_location), data=data,
+                                 expected_status=204)
         return response
 
     def get_campaign(self, campaign_id, expected_status):
         location = f'api/v2/campaigns/{campaign_id}.json'
         referer_location = f'campaign/{campaign_id}?'
 
-        response = self._request('GET', location, headers=self.headers(referer_location), expected_status=expected_status, jsonify=True)
+        response = self._request('GET', location, headers=self.headers(referer_location),
+                                 expected_status=expected_status, jsonify=True)
         return response.get('name')
 
