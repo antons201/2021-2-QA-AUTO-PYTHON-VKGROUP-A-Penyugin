@@ -3,15 +3,15 @@ import shutil
 import sys
 
 
-def create_dir(dir_name):
+def create_path(dir_name):
     if sys.platform.startswith('win'):
-        new_dir = 'C:\\' + dir_name
+        return 'C:\\' + dir_name
     else:
-        new_dir = '/tmp/' + dir_name
+        return '/tmp/' + dir_name
 
-    if os.path.exists(new_dir):
-        shutil.rmtree(new_dir)
 
-    os.makedirs(new_dir)
+def create_dir(dir_name):
+    if os.path.exists(dir_name):
+        shutil.rmtree(dir_name)
 
-    return new_dir
+    os.makedirs(dir_name)

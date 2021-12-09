@@ -1,5 +1,6 @@
 from base import Base
 from utils import responses, locations
+import pytest
 
 
 class TestMock(Base):

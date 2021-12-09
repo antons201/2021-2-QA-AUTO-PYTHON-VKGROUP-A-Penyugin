@@ -1,4 +1,5 @@
 import os
+import sys
 import time
 import logging
 import pytest
@@ -30,7 +31,8 @@ def wait_ready(host, port):
 
 
 def mock_handler(handler_dir, file, level, filtering=False, filtering_level=logging.ERROR):
-    mock_stdout = dir_helper.create_dir(handler_dir)
+    mock_stdout = dir_helper.create_path(handler_dir)
+    dir_helper.create_dir(mock_stdout)
     handler = RotatingFileHandler(os.path.join(mock_stdout, file), backupCount=1)
     handler.setLevel(level)
     if filtering:
@@ -38,7 +40,10 @@ def mock_handler(handler_dir, file, level, filtering=False, filtering_level=logg
 
     return handler
 
+
 def pytest_configure(config):
+    config.client_out = dir_helper.create_path("client_out")
+
     if not hasattr(config, 'workerinput'):
         info_handler = mock_handler("mock_stdout", "std_out.txt", logging.INFO, True)
         error_handler = mock_handler("mock_stderr", "std_err.txt", logging.ERROR)
@@ -48,6 +53,8 @@ def pytest_configure(config):
         mock.run_mock()
 
         wait_ready(settings.MOCK_HOST, settings.MOCK_PORT)
+
+        dir_helper.create_dir(config.client_out)
 
 
 @pytest.fixture(scope='session')
@@ -73,11 +80,11 @@ def client_logger(client_out_root):
 
 
 def pytest_unconfigure(config):
-    requests.get(f'http://{settings.MOCK_HOST}:{settings.MOCK_PORT}/shutdown')
+    if not hasattr(config, 'workerinput'):
+        requests.get(f'http://{settings.MOCK_HOST}:{settings.MOCK_PORT}/shutdown')
 
 
 @pytest.fixture(scope='session')
-def client_out_root():
-    client_out = dir_helper.create_dir("client_out")
-    client_out_file = os.path.join(client_out, "client_out.txt")
+def client_out_root(request):
+    client_out_file = os.path.join(request.config.client_out, "client_out.txt")
     yield client_out_file
