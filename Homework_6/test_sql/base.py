@@ -42,14 +42,14 @@ class MysqlBase:
 
         return count_requests_by_type_list
 
-    def create_top_popular_requests(self, logs_file):
+    def create_top_popular_requests(self, num, logs_file):
         request_urls = collections.Counter()
         top_popular_requests_list = []
 
         for line in logs_file:
             request_urls[line.split(" ")[6]] += 1
 
-        for request_url in request_urls.most_common(10):
+        for request_url in request_urls.most_common(num):
             top_popular_requests = TopPopularRequests(
                 url=request_url[0],
                 count=request_url[1]
@@ -60,7 +60,7 @@ class MysqlBase:
 
         return top_popular_requests_list
 
-    def create_top_5_requests_with_client_error(self, logs_file):
+    def create_top_requests_with_client_error(self, num, logs_file):
         requests_info = []
         top_5_requests_with_client_error_list = []
 
@@ -70,7 +70,7 @@ class MysqlBase:
                     [line.split(" ")[0], line.split(" ")[6], int(line.split(" ")[8]), int(line.split(" ")[9])])
         requests_info.sort(key=lambda x: x[3], reverse=True)
 
-        for i in range(5):
+        for i in range(num):
             top_5_requests_with_client_error = Top5RequestsWithClientError(
                 url=requests_info[i][1],
                 status=requests_info[i][2],
@@ -83,7 +83,7 @@ class MysqlBase:
 
         return top_5_requests_with_client_error_list
 
-    def create_top_5_clients_with_server_error(self, logs_file):
+    def create_top_clients_with_server_error(self, num, logs_file):
         requests_info = []
         requests_users_count = collections.Counter()
         top_5_clients_with_server_error_list = []
@@ -95,7 +95,7 @@ class MysqlBase:
         for request in requests_info:
             requests_users_count[request[0]] += 1
 
-        for requests_user_count in requests_users_count.most_common(5):
+        for requests_user_count in requests_users_count.most_common(num):
             top_5_clients_with_server_error = Top5ClientsWithServerError(
                 ip=requests_user_count[0],
                 count=requests_user_count[1]
