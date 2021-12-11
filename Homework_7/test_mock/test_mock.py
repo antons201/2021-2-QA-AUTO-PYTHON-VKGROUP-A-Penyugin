@@ -5,7 +5,6 @@ import pytest
 
 class TestMock(Base):
 
-    @pytest.mark.mock
     def test_get_surname(self, user):
         self.create_user(user)
 
