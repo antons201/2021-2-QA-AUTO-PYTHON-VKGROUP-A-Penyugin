@@ -4,9 +4,9 @@ import socket
 
 class Client:
 
-    def __init__(self):
+    def __init__(self, port):
         self.target_host = settings.MOCK_HOST
-        self.target_port = int(settings.MOCK_PORT)
+        self.target_port = int(port)
         self.client = None
         self.logger = None
 

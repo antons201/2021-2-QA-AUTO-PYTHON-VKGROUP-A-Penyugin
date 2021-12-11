@@ -41,6 +41,12 @@ def mock_handler(handler_dir, file, level, filtering=False, filtering_level=logg
     return handler
 
 
+def get_worker_port(config):
+    worker = getattr(config, 'workerinput')
+
+    return settings.MOCK_PORT_WORKERS[int(worker['workerid'][2:])]
+
+
 def pytest_configure(config):
     config.client_out = dir_helper.create_path("client_out")
 
@@ -50,11 +56,22 @@ def pytest_configure(config):
 
         logging.root.handlers = [info_handler, error_handler]
 
-        mock.run_mock()
-
-        wait_ready(settings.MOCK_HOST, settings.MOCK_PORT)
-
         dir_helper.create_dir(config.client_out)
+
+        port = settings.MOCK_PORT_MAIN
+    else:
+        port = get_worker_port(config)
+
+    mock.run_mock(port)
+    wait_ready(settings.MOCK_HOST, port)
+
+
+@pytest.fixture(scope='session')
+def port(request):
+    if hasattr(request.config, 'workerinput'):
+        return get_worker_port(request.config)
+    else:
+        return settings.MOCK_PORT_MAIN
 
 
 @pytest.fixture(scope='session')
@@ -80,8 +97,12 @@ def client_logger(client_out_root):
 
 
 def pytest_unconfigure(config):
-    if not hasattr(config, 'workerinput'):
-        requests.get(f'http://{settings.MOCK_HOST}:{settings.MOCK_PORT}/shutdown')
+    if hasattr(config, 'workerinput'):
+        port = get_worker_port(config)
+    else:
+        port = settings.MOCK_PORT_MAIN
+
+    requests.get(f'http://{settings.MOCK_HOST}:{port}/shutdown')
 
 
 @pytest.fixture(scope='session')

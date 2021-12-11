@@ -9,8 +9,8 @@ from mock.mock import USERS
 class Base:
 
     @pytest.fixture(scope='function', autouse=True)
-    def setup(self, client_logger):
-        self.client = Client()
+    def setup(self, client_logger, port):
+        self.client = Client(port)
         self.builder = Builder()
         self.client.create_client(client_logger)
 

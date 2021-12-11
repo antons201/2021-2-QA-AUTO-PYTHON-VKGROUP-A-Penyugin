@@ -51,10 +51,10 @@ def shutdown():
     return jsonify(f'Ok, exiting'), 200
 
 
-def run_mock():
+def run_mock(port):
     server = threading.Thread(target=app.run, kwargs={
         'host': settings.MOCK_HOST,
-        'port': settings.MOCK_PORT
+        'port': port
     })
 
     WSGIRequestHandler.protocol_version = "HTTP/1.1"
